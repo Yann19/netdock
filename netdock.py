@@ -4,12 +4,12 @@
 from sys import argv
 from pyroute2 import IPDB
 from pyroute2 import NetNS
-from os import symlink, path
+from os import symlink, path, remove
 from requests import get
 import re
 
 #ovs_lib is part of neutron library, you can get it on github
-# copy neutron directory in a python path like /usr/local and install oslo (.config, .log etc .. list!)
+# copy neutron directory in a python path like /usr/local and install oslo (see readme)
 import neutron.agent.common.ovs_lib as ovs_lib
 
 
@@ -27,7 +27,7 @@ def get_dock_id(name):
        return False
 
 
-def create_netns(Id):
+def ensure_netns(Id):
   #do not work as sudo, only as root (sudo docker start ? or for symlinks ? .. see to use rootwrapper ..)
   ns_file='/sys/fs/cgroup/devices/docker/'+str(Id)+'/tasks'
   file=open(ns_file)
@@ -36,7 +36,6 @@ def create_netns(Id):
   ns=ns.rstrip()
   ns_src='/proc/'+str(ns)+'/ns/net'
   ns_dst='/var/run/netns/'+str(ns)
-  print str(ns)
   if not path.isfile(ns_dst):
     try:
       #add test for valid symlink .. 
@@ -46,6 +45,16 @@ def create_netns(Id):
       return False
   else:
     return ns
+
+def del_netns(ns):
+  remove('/var/run/netns/'+str(ns))
+
+def get_eth(ns=''):
+  if ns:
+    ipdb=IPDB(nl=NetNS(ns))
+  else:
+    ipdb=IPDB()
+  return ipdb.by_name.keys()
 
 def create_veth(ns, prefix=''):
   #prefix can be usefull if there are more than one interface.. to see
@@ -60,6 +69,11 @@ def create_veth(ns, prefix=''):
   ipdb.interfaces[eth_dock].commit()
   ipdb.release()
   return (eth_host,eth_dock)
+
+def del_veth(eth):
+  ipdb=IPDB()
+  ipdb.interfaces[eth].remove().commit()
+  ipdb.release() 
 
 def add_ip(eth, ip='', ns=''):
   if ns:
@@ -87,6 +101,7 @@ def int_up(eth, ns=''):
     ipdb=IPDB()
   ipdb.interfaces[eth].up()
   ipdb.interfaces[eth].commit()
+  ipdb.release()
 
 def add_port(br, eth):
   ovs=ovs_lib.BaseOVS()
@@ -94,4 +109,7 @@ def add_port(br, eth):
     return False
   ovs.add_bridge(br).add_port(eth)
 
+def del_port(br, eth):
+  ovs=ovs_lib.BaseOVS()
+  ovs.add_bridge(br).delete_port(eth)
 
