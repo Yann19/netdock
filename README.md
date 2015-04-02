@@ -9,7 +9,6 @@ based on : https://github.com/jpetazzo/pipework
 
 Cause I use ovs_lib (part of neutron : https://github.com/openstack/neutron/) you have to install oslo components to make it works.
 
-::
 
      aptitude install python-dev  
      pip install --upgrade oslo.config
