@@ -10,7 +10,6 @@ based on : https://github.com/jpetazzo/pipework
 ovs_lib (part of neutron : https://github.com/openstack/neutron/) so you have to install oslo components to make it works.
 
      aptitude install python-dev  
-     python-keystoneclient
      aptitude install python-pastedeploy
      pip install --upgrade oslo.config
      pip install --upgrade oslo.log
@@ -19,6 +18,10 @@ ovs_lib (part of neutron : https://github.com/openstack/neutron/) so you have to
      pip install --upgrade oslo.messaging
      pip install --upgrade oslo.concurrency
      pip install --upgrade retrying
+     pip install --upgrade babel
+     pip install --upgrade iso8601
+     pip install --upgrade python-keystoneclient
+     pip install --upgrade routes
 
 pyroute2
 
