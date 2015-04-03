@@ -23,7 +23,7 @@ ovs_lib (part of neutron : https://github.com/openstack/neutron/) so you have to
      pip install --upgrade python-keystoneclient
      pip install --upgrade routes
 
-pyroute2
+pyroute2 (https://github.com/svinota/pyroute2, it will be used for the ovs part instead of ovs_lib)
 
      pip install --upgrade pyroute2
 
@@ -33,6 +33,10 @@ I work on ubuntu 14.04 with docker 1.5
      add-apt-repository ppa:docker-maint/testing
      aptitude update
      aptitude install docker.io
+
+python-py (https://github.com/docker/docker-py)
+
+     pip install --upgrade docker-py
 
 I launch docker with : '-H tcp://127.0.0.1:8080 -H unix:///var/run/docker.sock' (/etc/default/docker)
 
