@@ -4,9 +4,7 @@
 from sys import argv
 from pyroute2 import IPDB
 from pyroute2 import NetNS
-from docker import Client
 from os import symlink, path, remove
-import re
 
 #ovs_lib is part of neutron library, you can get it on github
 # copy neutron directory in a python path like /usr/local and install oslo (see readme)
@@ -14,16 +12,6 @@ import neutron.agent.common.ovs_lib as ovs_lib
 
 
 ##api docker
-def get_dock_id(name):
-  c=Client(base_url='http://127.0.0.1:8080')
-  for dock in c.containers():
-    if '/'+name in dock['Names']:
-      Id=dock['Id']
-  if Id:
-    return Id
-  else:
-    return False
-  
 
 def ensure_netns(Id):
   #do not work as sudo, only as root (sudo docker start ? or for symlinks ? .. see to use rootwrapper ..)
@@ -100,6 +88,12 @@ def int_up(eth, ns=''):
   ipdb.interfaces[eth].up()
   ipdb.interfaces[eth].commit()
   ipdb.release()
+
+def get_bridge(eth):
+  ovs=ovs_lib.BaseOVS()
+  for br in ovs.get_bridges():
+    if eth in ovs.add_bridge(br).get_port_name_list():
+      return br 
 
 def add_port(br, eth):
   ovs=ovs_lib.BaseOVS()
