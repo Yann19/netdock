@@ -14,7 +14,6 @@ import neutron.agent.common.ovs_lib as ovs_lib
 ##api docker
 
 def ensure_netns(Id):
-  #do not work as sudo, only as root (sudo docker start ? or for symlinks ? .. see to use rootwrapper ..)
   ns_file='/sys/fs/cgroup/devices/docker/'+str(Id)+'/tasks'
   file=open(ns_file)
   ns=file.readlines()[0]

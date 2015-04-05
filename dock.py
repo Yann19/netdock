@@ -20,10 +20,8 @@ def usage():
 
 def start(server, name, bridge, ip, gateway):
   id=api.start(name, server)
-  print str(id)
   if id:
     ns=net.ensure_netns(id)
-    print ns
     heth,deth=net.create_veth(ns)
     net.add_ip(deth, ip, ns)
     net.add_route('default', gateway, ns)
@@ -38,10 +36,11 @@ def stop(server, name):
   l_eth=net.get_eth(ns)
   l_eth.remove('lo')
   for eth in l_eth:
-    br=net.get_bridge(eth)
+    heth=re.sub('deth','heth',eth)
+    br=net.get_bridge(heth)
     if br:
-      net.del_port(br, eth)
-      net.del_veth(re.sub('deth','heth',eth))
+      net.del_port(br, heth)
+      net.del_veth(heth)
   net.del_netns(ns)
   api.stop(name, server)  
 
